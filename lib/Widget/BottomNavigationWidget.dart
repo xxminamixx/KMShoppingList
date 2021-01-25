@@ -1,23 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:km_shopping_list/Widget/BottomNavigationIndexCubit.dart';
+import 'package:km_shopping_list/Widget/BottomNavigationViewModel.dart';
 import 'package:km_shopping_list/Widget/HomeWidget.dart';
+import 'package:km_shopping_list/Widget/SettingWidget.dart';
+import 'package:provider/provider.dart';
 
 class BottomNavigationWidget extends StatelessWidget {
   /* タブに表示するWidget配列 */
   final List<Widget> _tabItem = [
     HomeWidget(),
-    HomeWidget(),
+    SettingWidget(),
   ];
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => BottomNavigationIndexCubit(),
-      child: BlocBuilder<BottomNavigationIndexCubit, int>(
-          builder: (builderContext, index) {
-            return _mainWidget(builderContext, index);
-          }),
+    return ChangeNotifierProvider(
+        create: (_) => BottomNavigationViewModel(),
+        builder: (childContext, widget) {
+          // indexを監視
+          final index = childContext.select((BottomNavigationViewModel viewModel) => viewModel.index);
+          return _mainWidget(childContext, index);
+        },
     );
   }
 
@@ -35,13 +37,13 @@ class BottomNavigationWidget extends StatelessWidget {
               label: 'リスト',
             ),
             BottomNavigationBarItem(
-              icon: Icon(Icons.shopping_cart_rounded),
-              label: '登録',
+              icon: Icon(Icons.settings),
+              label: '設定',
             ),
           ],
           currentIndex: index,
           onTap: (index) {
-            context.read<BottomNavigationIndexCubit>().changeIndex(index);
+            context.read<BottomNavigationViewModel>().changeIndex(index);
           }
       ),
     );
